@@ -90,7 +90,7 @@ class User(db.Model):
     )
 
     password = db.Column(
-        db.Text,
+        db.String,
         nullable=False,
     )
 

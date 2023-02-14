@@ -334,17 +334,16 @@ def homepage():
     """
 
     if g.user:
+        following_users = [users.id for users in g.user.following]
         messages = (Message
-                    .query
+                    .query.filter(Message.user_id.in_(following_users))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
-  
-        likes = Likes.query.filter(Likes.message_id==messages.id).all()
+        messages_ids = [message.id for message in messages]
+        likes = Likes.query.filter(Likes.message_id.in_(messages_ids)).all()
         likes = [msg_id.message_id for msg_id in likes]
-        print(likes)
         return render_template('home.html', messages=messages, likes=likes)
-
     else:
         return render_template('home-anon.html')
 
