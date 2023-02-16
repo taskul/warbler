@@ -52,8 +52,6 @@ class UserModelTestCase(TestCase):
             password='BuyMeBacon',
             image_url=None
         )
-        db.session.add(u1)
-        db.session.add(u2)
         db.session.commit()
 
         self.u1 = u1
