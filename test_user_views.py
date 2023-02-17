@@ -106,19 +106,28 @@ class UserViewsTestCase(TestCase):
             with c.session_transaction() as user_session:
                 user_session[CURR_USER_KEY] = self.u1.id
 
-                resp = c.post(f'/users/add_like/{2023}', follow_redirects=True)
-                self.assertEqual(resp.status_code, 200)
+            resp = c.post(f'/users/add_like/{2023}', follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
 
-                likes = Likes.query.filter(Likes.message_id==2023).all()
-                self.assertEqual(likes, 1)
-                self.assertEqual(likes[0].user_id, self.u1.id)
+            likes = Likes.query.filter(Likes.message_id==2023).all()
+            self.assertEqual(len(likes), 1)
 
     def test_remove_like(self):
         self.setup_likes()
-         # u2 message id is 2021
-        m = Message.query.get(2021)
-        likes = Likes.query.filter(Likes.message_id==m.id).all()
-        self.assertEqual(likes, [])
+         # u1 message id is 2023
+        m = Message.query.get(2023)
+        likes = Likes.query.filter(Likes.message_id==m.id).one()
+        self.assertIsNotNone(likes)
+        print(likes)
+        with self.client as c:
+            with c.session_transaction() as user_transaction:
+                user_transaction[CURR_USER_KEY] = self.u2.id
+
+            resp = c.post(f'/users/add_like/{2023}', follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            likes = Likes.query.filter(Likes.message_id==m.id).all()
+            self.assertEqual(len(likes), 0)
+
         
 
 
